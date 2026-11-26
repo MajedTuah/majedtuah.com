@@ -1,0 +1,933 @@
+@import url('https://api.fontshare.com/v2/css?f[]=sentient@300,400,500,700,301,401&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Reem+Kufi:wght@500;700&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Sentient', ui-serif, Georgia, serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --font-display: 'Sentient', ui-serif, Georgia, serif;
+  --font-arabic: 'Reem Kufi', 'Noto Kufi Arabic', sans-serif;
+  --color-ink: #0b0b0c; /* obsidian background */
+  --color-bone: #e7e6e2; /* soft white text */
+  --color-ash: #8e8d89; /* muted text, 5.9:1 on obsidian */
+  --color-mist: #bebdb8;
+  --color-accent: #d4d3ce; /* silver highlight */
+  --color-graphite: #2c2c2f;
+  --color-steel: #5c5c61;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background: var(--color-ink);
+    color: var(--color-bone);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-ink);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Shared                                                              */
+/* ------------------------------------------------------------------ */
+
+.mono {
+  font-family: var(--font-mono);
+  font-weight: 400;
+}
+.disp {
+  font-family: var(--font-display);
+  font-weight: 500;
+}
+.ar {
+  font-family: var(--font-arabic);
+}
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-ash);
+}
+
+/* accent glass */
+.glass {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015) 60%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 30px 60px -30px rgba(0, 0, 0, 0.8);
+}
+/* The fixed navbar: solid smoked glass instead of backdrop-filter. A blur over the live 3D canvas forces the
+   browser to read back and re-blur the canvas every frame, which was the main source of hero lag. */
+.glass-blur {
+  background: linear-gradient(160deg, rgba(34, 34, 37, 0.92), rgba(18, 18, 20, 0.9));
+}
+.glow {
+  position: absolute;
+  pointer-events: none;
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 255, 255, 0.07) 0%,
+    rgba(255, 255, 255, 0.035) 28%,
+    rgba(255, 255, 255, 0.012) 55%,
+    rgba(255, 255, 255, 0) 78%,
+    transparent 100%
+  );
+}
+
+/* ink button: the fill sweeps up on hover */
+.ink-btn {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  isolation: isolate;
+  transition: color 0.45s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.ink-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  transform: translateY(101%);
+  transition: transform 0.45s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.ink-btn:hover::before {
+  transform: translateY(0);
+}
+.btn-light {
+  background: var(--color-bone);
+  color: var(--color-ink);
+}
+.btn-light::before {
+  background: #ecebe7;
+}
+.btn-glass {
+  color: var(--color-bone);
+}
+.btn-glass::before {
+  background: var(--color-bone);
+}
+.btn-glass:hover {
+  color: var(--color-ink);
+}
+
+.navlink {
+  font-size: 14px;
+  color: var(--color-ash);
+  transition: color 0.3s;
+}
+.navlink:hover,
+.navlink.on {
+  color: var(--color-bone);
+}
+.navlink .step {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  margin-right: 6px;
+  color: var(--color-ash);
+}
+
+/* reveals */
+@keyframes rise {
+  from {
+    transform: translateY(118%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes porIn {
+  from {
+    opacity: 0;
+    transform: translateY(60px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Hero                                                                */
+/* ------------------------------------------------------------------ */
+
+.hero {
+  position: relative;
+  height: max(820px, 100svh);
+  overflow: hidden;
+}
+.hero .abs {
+  position: absolute;
+}
+.px {
+  will-change: transform; /* moved by GSAP quickTo in Hero.tsx */
+}
+/* Layered parallax: positions only; GSAP quickTo moves each layer (Hero.tsx) */
+.l-n1 {
+  left: 40px;
+  top: 104px;
+  z-index: 8;
+}
+.l-por {
+  left: 50%;
+  bottom: 0;
+  width: min(600px, 44vw);
+  margin-left: calc(min(600px, 44vw) * -0.47);
+  z-index: 10;
+}
+.l-n2 {
+  right: 48px;
+  bottom: 132px;
+  z-index: 18;
+}
+.name {
+  font-family: var(--font-arabic);
+  font-weight: 700;
+  font-size: clamp(110px, 14vw, 210px);
+  line-height: 1;
+  white-space: nowrap;
+}
+.word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding: 0.04em 0.04em 0.14em;
+}
+.word > span {
+  display: inline-block;
+  transform: translateY(118%);
+}
+.go .word > span {
+  animation: rise 1.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.rv {
+  opacity: 0;
+}
+.go .rv {
+  animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.rv-por {
+  opacity: 0;
+}
+.go .rv-por {
+  animation: porIn 1.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.por-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0, #000 10%), linear-gradient(to bottom, #000 78%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 0, #000 10%), linear-gradient(to bottom, #000 78%, transparent 100%);
+  mask-composite: intersect;
+}
+
+/* splash: outlines trace, ink floods, the bone page lifts */
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--color-bone);
+  color: var(--color-ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+.splash svg {
+  width: min(86%, 1100px);
+  height: auto;
+  overflow: visible;
+}
+.splash text {
+  font-family: var(--font-arabic);
+  font-weight: 700;
+  fill: var(--color-ink);
+  fill-opacity: 0;
+  stroke: var(--color-ink);
+  stroke-width: 1.6;
+  stroke-dasharray: 1800;
+  stroke-dashoffset: 1800;
+}
+
+/* project book */
+.stage {
+  display: block;
+  perspective: 1300px;
+  width: 230px;
+  height: 310px;
+}
+.book {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+.page {
+  position: absolute;
+  inset: 0 0 0 8px;
+  transform: translateZ(-6px); /* sits behind every cover in 3D, so nothing intersects it */
+  background: #ecebe7;
+  color: var(--color-ink);
+  padding: 26px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-radius: 2px 6px 6px 2px;
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.8);
+}
+.cover {
+  position: absolute;
+  inset: 0;
+  border-radius: 2px 6px 6px 2px;
+  padding: 24px 22px 20px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transform-origin: left center;
+  backface-visibility: hidden;
+  opacity: 0;
+  z-index: 1;
+  transition:
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.6s ease;
+  box-shadow:
+    0 30px 60px -20px rgba(0, 0, 0, 0.85),
+    inset 0 0 0 1px rgba(231, 230, 226, 0.12);
+}
+.cover::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 12px;
+  background: var(--spine);
+  border-radius: 2px 0 0 2px;
+}
+/* Book change = a page turn: the outgoing cover swings open on its spine (and vanishes past 90deg thanks to
+   backface-visibility) while the next book eases in underneath a beat later. Waiting covers reset with no
+   transition, so nothing animates while invisible. */
+.cover.prev {
+  z-index: 4;
+  transform: translateZ(3px) rotateY(-105deg);
+  transition:
+    transform 1s cubic-bezier(0.65, 0, 0.35, 1),
+    opacity 0.35s ease 0.7s;
+}
+.cover.next {
+  /* flat (no tilt): a tilted cover would cut through the inner page in 3D */
+  transform: translate3d(36px, 0, 2px) scale(0.97);
+  transition: none;
+}
+.cover.active {
+  opacity: 1;
+  z-index: 3;
+  transform: translateZ(2px) rotateY(0deg);
+  transition:
+    transform 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s,
+    opacity 0.7s ease 0.2s;
+}
+.stage:hover .cover.active,
+.stage:focus-visible .cover.active {
+  transform: translateZ(2px) rotateY(-34deg);
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ------------------------------------------------------------------ */
+/* About: résumé + projects pages                                      */
+/* ------------------------------------------------------------------ */
+
+.page-in {
+  animation: pageIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateX(var(--from, 40px));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.row {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1.1fr) minmax(0, 1.4fr) minmax(0, 1fr) 120px;
+  gap: 32px;
+  align-items: baseline;
+  padding: 36px 16px;
+  border-bottom: 1px solid rgba(231, 230, 226, 0.14);
+  transition: background 0.4s;
+}
+.row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+.row .rtitle {
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.row:hover .rtitle {
+  transform: translateX(8px);
+}
+
+/* ------------------------------------------------------------------ */
+/* Sections                                                            */
+/* ------------------------------------------------------------------ */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+/* capability cards */
+.cap {
+  transition:
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.4s,
+    background 0.4s;
+}
+.cap:hover {
+  transform: translateY(-6px);
+  border-color: rgba(212, 211, 206, 0.45);
+  background: rgba(255, 255, 255, 0.07);
+}
+.cap .cap-ar {
+  transition: -webkit-text-stroke-color 0.4s, color 0.4s;
+}
+.cap:hover .cap-ar {
+  color: rgba(212, 211, 206, 0.12);
+}
+
+/* experience timeline: --p (0..1) fills the line */
+.timeline {
+  --p: 0;
+  position: relative;
+}
+.timeline::before,
+.timeline::after {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  border-radius: 2px;
+}
+.timeline::before {
+  background: rgba(231, 230, 226, 0.12);
+}
+.timeline::after {
+  background: linear-gradient(to bottom, var(--color-accent), var(--color-steel));
+  transform-origin: top;
+  transform: scaleY(var(--p));
+  box-shadow: 0 0 16px rgba(212, 211, 206, 0.5);
+}
+.tl-dot {
+  position: absolute;
+  left: 0;
+  top: 34px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-ink);
+  border: 2px solid rgba(231, 230, 226, 0.3);
+  transition:
+    border-color 0.4s,
+    box-shadow 0.4s,
+    background 0.4s;
+}
+.tl-dot.on {
+  border-color: var(--color-accent);
+  background: var(--color-graphite);
+  box-shadow: 0 0 0 5px rgba(212, 211, 206, 0.15);
+}
+
+/* AI lab */
+.meter {
+  height: 6px;
+  border-radius: 6px;
+  background: rgba(231, 230, 226, 0.1);
+  overflow: hidden;
+}
+.meter > span {
+  display: block;
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.tier {
+  transition:
+    border-color 0.4s,
+    background 0.4s,
+    opacity 0.4s,
+    transform 0.4s;
+}
+.tier.running {
+  border-color: rgba(212, 211, 206, 0.5);
+  transform: translateY(-3px);
+}
+.tier.winner {
+  border-color: var(--color-accent);
+  background: rgba(255, 255, 255, 0.08);
+}
+.tier.skipped {
+  opacity: 0.4;
+}
+.stage-btn {
+  transition:
+    background 0.3s,
+    color 0.3s,
+    border-color 0.3s;
+}
+
+/* ------------------------------------------------------------------ */
+/* Small screens: the hero stacks                                      */
+/* ------------------------------------------------------------------ */
+
+@media (max-width: 1023px) {
+  .hero {
+    height: auto;
+    padding: 110px 20px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+  }
+  .hero .abs {
+    position: relative;
+    inset: auto;
+    margin: 0;
+    transform: none;
+    width: auto;
+  }
+  .l-n1 .name,
+  .l-n2 .name {
+    font-size: 30vw;
+  }
+  .l-n1 {
+    align-self: flex-end;
+  }
+  .l-n2 {
+    align-self: flex-start;
+    margin-top: -12vw !important;
+  }
+  .l-por {
+    order: 3;
+    align-self: center;
+    width: 100% !important;
+    max-width: 480px;
+  }
+  .h-intro {
+    order: 4;
+  }
+  .h-card {
+    order: 5;
+  }
+  .h-soc {
+    order: 6;
+  }
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .splash {
+    display: none;
+  }
+  .rv,
+  .rv-por,
+  .word > span,
+  .go .rv,
+  .go .rv-por,
+  .go .word > span,
+  .page-in {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+  .px,
+  .book,
+  .cover,
+  .meter > span,
+  .tier {
+    transition: none;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Hero 3D scene (three.js), behind the portrait                       */
+/* ------------------------------------------------------------------ */
+
+.l-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  animation: sceneIn 1.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+.l-scene .hero-canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+@keyframes sceneIn {
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (max-width: 1023px) {
+  .l-scene {
+    opacity: 0.7;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .l-scene {
+    animation: none;
+  }
+}
+
+/* Nexa's little blue ball on its book cover */
+.orb {
+  position: absolute;
+  right: 26px;
+  bottom: 52px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffffff 0%, var(--orb) 38%, color-mix(in srgb, var(--orb) 55%, #000) 100%);
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--orb) 70%, transparent),
+    0 0 42px color-mix(in srgb, var(--orb) 35%, transparent);
+  animation: orbFloat 3.2s ease-in-out infinite;
+}
+@keyframes orbFloat {
+  50% {
+    transform: translateY(-6px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .orb {
+    animation: none;
+  }
+}
+
+/* ================================================================== */
+/* Motion & polish layer (Liminal / Freshmilk techniques)              */
+/* ================================================================== */
+
+/* Splash: Latin wordmark + preloader counter */
+.splash-word {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(28px, 4.4vw, 64px);
+  letter-spacing: 0.32em;
+  line-height: 1;
+  margin-right: -0.32em; /* balance the trailing tracking */
+}
+.splash-letter {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.08em;
+}
+.splash-letter > span {
+  display: inline-block;
+}
+.splash-count {
+  position: absolute;
+  right: 28px;
+  bottom: 24px;
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Section headings: bigger and lighter, Liminal-style. Lines are split and revealed by GSAP. */
+.section-title {
+  font-weight: 300;
+  font-size: clamp(64px, 9.5vw, 156px);
+  line-height: 0.9;
+  letter-spacing: -0.025em;
+}
+.outline-word {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--color-accent);
+}
+
+/* Clip-path wipe reveal. Ends slightly outside the box so shadows and hover lifts aren't clipped. */
+.reveal-wipe {
+  clip-path: inset(0 100% 0 0);
+  transform: scale(0.985);
+  transition:
+    clip-path 1.15s cubic-bezier(0.76, 0, 0.24, 1),
+    transform 1.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-wipe.in {
+  clip-path: inset(-40px -40px -40px -40px);
+  transform: none;
+}
+
+/* Experience: cards stick and stack on desktop (top/step mirrored in Experience.tsx) */
+@media (min-width: 1024px) {
+  .stack-item {
+    position: sticky;
+    top: calc(120px + var(--i) * 18px);
+  }
+  .stack-card {
+    background-color: #111113; /* opaque under the glass so stacked cards don't show through */
+    will-change: transform, opacity;
+  }
+}
+
+/* About pager: the old page slides out via the View Transitions API; the new one plays .page-in */
+.about-panel {
+  view-transition-name: about-panel;
+}
+::view-transition-old(about-panel) {
+  animation: vtOut 0.35s cubic-bezier(0.7, 0, 0.84, 0) both;
+}
+::view-transition-new(about-panel) {
+  animation: none;
+}
+@keyframes vtOut {
+  to {
+    opacity: 0;
+    transform: translateY(-16px);
+    filter: blur(6px);
+  }
+}
+
+/* Burger + mobile menu */
+.burger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
+  cursor: pointer;
+}
+.burger span,
+.burger span::before {
+  position: absolute;
+  width: 16px;
+  height: 1.5px;
+  background: var(--color-bone);
+  transition: transform 0.4s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.burger span {
+  transform: translateY(-3px);
+}
+.burger span::before {
+  content: '';
+  transform: translateY(6px);
+}
+.burger span.x {
+  transform: rotate(45deg);
+}
+.burger span.x::before {
+  transform: rotate(-90deg);
+}
+.mobile-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: 120px 24px 32px;
+  background: rgba(11, 11, 12, 0.94);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+.mm-link {
+  display: block;
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(44px, 12vw, 84px);
+  line-height: 1.05;
+  color: var(--color-bone);
+}
+.mm-link > span {
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-wipe {
+    clip-path: none;
+    transform: none;
+    transition: none;
+  }
+  ::view-transition-old(about-panel) {
+    animation: none;
+  }
+}
+
+/* Carousel (What I build, Teaching) */
+.car-track {
+  display: flex;
+  align-items: stretch;
+  gap: 20px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding-block: 6px 10px;
+  /* bleed to BOTH edges of the viewport, Liminal-style. The matching padding keeps the first card aligned with
+     the heading. Snap alignment (scroll-padding) is set from this padding in Carousel.tsx. */
+  --bleed: calc((100vw - 100%) / 2);
+  margin-inline: calc(var(--bleed) * -1);
+  padding-inline: var(--bleed);
+  outline: none;
+}
+.car-track::-webkit-scrollbar {
+  display: none;
+}
+.car-track:focus-visible {
+  outline: 1px solid var(--color-accent);
+  outline-offset: 6px;
+  border-radius: 24px;
+}
+.car-slide {
+  flex: 0 0 min(440px, 84vw);
+  scroll-snap-align: start;
+  opacity: 0.38;
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.car-slide.is-current,
+.car-slide:hover {
+  opacity: 1;
+}
+.car-progress {
+  transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.car-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: transparent;
+  color: var(--color-bone);
+  cursor: pointer;
+  transition:
+    background 0.35s,
+    color 0.35s,
+    border-color 0.35s,
+    opacity 0.35s;
+}
+.car-btn:hover:not(:disabled) {
+  background: var(--color-bone);
+  color: var(--color-ink);
+  border-color: var(--color-bone);
+}
+.car-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+@media (prefers-reduced-motion: reduce) {
+  .car-slide,
+  .car-progress {
+    transition: none;
+  }
+}
+
+/* Scroll-driven carousel (desktop): page scroll moves the track, so no snapping or manual horizontal scroll */
+.car-track.is-scrubbed {
+  scroll-snap-type: none;
+  overflow-x: hidden;
+}
+.car-track.is-scrubbed .car-slide {
+  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.car-track:not(.is-scrubbed) ~ div .car-hint {
+  display: none;
+}
+
+/* Passed cards fade well below upcoming ones, and the left edge fades instead of cutting them off */
+.car-slide.is-past {
+  opacity: 0.12;
+}
+.car-track.has-past {
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 160px);
+  mask-image: linear-gradient(to right, transparent 0, #000 160px);
+}
+
+/* Book label and inner page crossfade with each new book (timed to land as the new cover settles) */
+.book-fade {
+  animation: bookFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+}
+@keyframes bookFade {
+  /* uses `translate`, not `transform`, so it never overrides the page's translateZ depth */
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .book-fade {
+    animation: none;
+  }
+}
