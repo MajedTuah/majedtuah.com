@@ -218,7 +218,7 @@ export default function Hero() {
           <div className="rv flex flex-col gap-4" style={{ animationDelay: '0.8s' }}>
             <p className="eyebrow m-0">AI engineer · Kuala Lumpur</p>
             <h2 className="m-0 text-[30px] leading-[1.12] font-medium tracking-[-0.01em]">
-              I have Claude Code and an ,
+              I have Claude Code and ,
               <br />
               too many browser tabs
               <br/>

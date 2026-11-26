@@ -1,7 +1,8 @@
 /*
- * Production /api/ask on Cloudflare Pages. Same pipeline as local dev (server/dev-ask.ts):
+ * Production /api/ask. Same pipeline as local dev (server/dev-ask.ts):
  * Workers AI embeds and reranks, Groq writes the answer, KV counts questions.
- * Bindings: AI, ASK_KV. Secrets: GROQ_API_KEY, and TURNSTILE_SECRET once the widget is on.
+ * worker/index.ts calls this. Bindings: AI, ASK_KV. Secrets: GROQ_API_KEY,
+ * and TURNSTILE_SECRET once the widget is on.
  */
 import corpusJson from '../../server/corpus.json'
 import { NDJSON_HEADERS, originAllowed, originList, parseAskBody, turnstileOk } from '../../server/rag/http.ts'
@@ -12,7 +13,7 @@ import type { Corpus } from '../../server/rag/types.ts'
 import { workersEmbed, workersRerank, type WorkersAi } from '../../server/providers/workers-ai.ts'
 import { EMAIL } from '../../src/data.ts'
 
-interface Env {
+export interface Env {
   AI: WorkersAi
   ASK_KV: KvLike
   GROQ_API_KEY: string
