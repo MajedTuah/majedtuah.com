@@ -19,6 +19,8 @@ Every change to majedtuah.com is written down here, newest first.
 - Step-by-step Hugging Face upload instructions in docs/10.
 
 ### Fixed
+- The Cloudflare deploy failed because the Worker name in `wrangler.jsonc` was `majedtuah.com`, and Worker names may only use lowercase letters, numbers and dashes. It is now `majedtuah-com`.
+- `/api/ask` now answers "not configured" (503) when the `ASK_KV` counter or the `AI` binding is missing. Before, it ran the pipeline and failed partway through.
 - On a fresh dev server, opening the AI Lab made Vite reload the whole page once, because it found transformers.js late. The package is now pre-bundled (`optimizeDeps.include`).
 - The demo showed "0.00 ms" for very fast tiers, but browsers round timers to 0.1 ms. It now shows "<0.1 ms".
 - When the teacher isn't loaded and Tier 2 answers below its 85% threshold, the result now says "teacher not loaded".

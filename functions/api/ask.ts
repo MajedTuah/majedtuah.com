@@ -42,6 +42,8 @@ export async function onRequestPost({ request, env }: PagesContext): Promise<Res
     return json(403, 'This demo only answers questions asked on the site itself.')
   }
   if (!env.GROQ_API_KEY) return json(503, 'The answer model is not configured.')
+  // Without KV the 3-question limit can't be enforced, so refuse rather than run unlimited.
+  if (!env.ASK_KV || !env.AI) return json(503, 'The question counter is not configured yet.')
 
   let raw: unknown
   try {
