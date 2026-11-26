@@ -8,6 +8,8 @@ export const LINKS = {
   repos: 'https://github.com/MajedTuah?tab=repositories',
   linkedin: 'https://www.linkedin.com/in/muhamad-majed-tuah-mohd-hafizuddin',
   email: `mailto:${EMAIL}`,
+  /** Opens the visitor's Outlook on the web, with a new message addressed here. */
+  outlook: `https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(EMAIL)}`,
   cv: '/MajedTuah_Resume.pdf',
 }
 
