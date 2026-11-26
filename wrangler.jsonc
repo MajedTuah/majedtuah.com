@@ -10,5 +10,13 @@
   },
   "ai": {
     "binding": "AI"
-  }
+  },
+  // Counts questions (3 per visitor, 200 per day). No id: wrangler creates the namespace on first deploy.
+  "kv_namespaces": [{ "binding": "ASK_KV" }],
+  // Public settings only. Secrets (GROQ_API_KEY, TURNSTILE_SECRET) go in the dashboard as type Secret.
+  // Add the custom domain to ALLOWED_ORIGINS at launch (decision D-014).
+  "vars": {
+    "ALLOWED_ORIGINS": "https://majedtuah-com.majedtuah19.workers.dev",
+    "GROQ_MODEL": "openai/gpt-oss-20b",
+  },
 }

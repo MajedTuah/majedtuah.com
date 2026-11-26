@@ -19,6 +19,7 @@ Every change to majedtuah.com is written down here, newest first.
 - Step-by-step Hugging Face upload instructions in docs/10.
 
 ### Fixed
+- `/api/ask` rejected every question on the live site ("This demo only answers questions asked on the site itself") because `ALLOWED_ORIGINS` was empty. `wrangler.jsonc` now lists the workers.dev address, declares the `ASK_KV` question counter (wrangler creates it on deploy), and sets `GROQ_MODEL`.
 - The Cloudflare deploy failed because the Worker name in `wrangler.jsonc` was `majedtuah.com`, and Worker names may only use lowercase letters, numbers and dashes. It is now `majedtuah-com`.
 - `/api/ask` now answers "not configured" (503) when the `ASK_KV` counter or the `AI` binding is missing. Before, it ran the pipeline and failed partway through.
 - On a fresh dev server, opening the AI Lab made Vite reload the whole page once, because it found transformers.js late. The package is now pre-bundled (`optimizeDeps.include`).
