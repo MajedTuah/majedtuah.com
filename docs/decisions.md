@@ -95,6 +95,7 @@ If a decision is ever reversed, the old entry stays and gets a "Superseded by D-
 - **Alternatives:** onnxruntime-web on its own, with a hand-written tokenizer (more code, and more ways to get it wrong).
 - **Trade-off:** one more package. It's only downloaded when the AI Lab opens, so the first page load isn't affected.
 - **Date:** 2026-11-26
+- **Status:** the WebGPU part is superseded by [D-016](#d-016-run-the-neural-tiers-on-webassembly-only-single-threaded).
 
 ## D-008 The RAG corpus is pre-computed and stored as a file
 - **Decision:**
@@ -164,4 +165,66 @@ If a decision is ever reversed, the old entry stays and gets a "Superseded by D-
 - **Why:** you asked for it. It also means no money is spent until the site works, and search engines don't see a half-finished site, because `noindex` stays on until launch.
 - **Alternatives:** buy now (pays for a domain that points at nothing).
 - **Trade-off:** at launch, three settings need the new domain added: Turnstile hostnames, `ALLOWED_ORIGINS`, and the rate-limit rule. They're listed in [13-deploy-and-domain.md](13-deploy-and-domain.md).
+- **Date:** 2026-11-26
+
+## D-015 Serve the ONNX Runtime engine from our own site
+- **Decision:** `scripts/copy-ort.mjs` copies onnxruntime-web's WebAssembly engine into `public/ort/` before every `dev` and `build`. The worker loads the engine from there, not from the jsDelivr CDN that transformers.js uses by default.
+- **Why:**
+  - Code we load from a third party could change under us.
+  - The security headers can say "scripts only from this site".
+  - The site keeps working even if the CDN is down.
+- **Alternatives:** the default CDN (zero setup, but it adds a third party to the page's trust).
+- **Trade-off:**
+  - We use the **plain** build (14 MB), not the default "asyncify" one (27 MB), because Cloudflare Pages rejects files over 25 MB. The plain build is the one transformers.js already uses for older Safari, so it's supported.
+  - `public/ort/` is generated, so it's gitignored.
+- **Date:** 2026-11-26
+
+## D-016 Run the neural tiers on WebAssembly only, single-threaded
+- **Decision:** the student and teacher run with `device: 'wasm'` and one thread. This supersedes the "WebGPU when available" part of D-007.
+- **Why:**
+  - The models are int8-quantized, and WebGPU in onnxruntime-web doesn't support the int8 operators well. It would fall back or fail unpredictably across browsers.
+  - Threads need special cross-origin isolation headers, which would also block the Turnstile iframe.
+  - bert-tiny answers in a few milliseconds on a single thread anyway.
+- **Alternatives:** WebGPU with float16 models (bigger downloads, and support varies a lot between browsers).
+- **Trade-off:** the 110 MB teacher is slower on WASM, roughly 50–200 ms on a laptop. That's acceptable for the "hard cases only" tier.
+- **Date:** 2026-11-26
+
+## D-017 Fix and retrain BrainDump before putting it on the site
+- **Decision:** before exporting, BrainDump itself was fixed and retrained. The changes are in `braindump.ai-main`:
+  - **Tier 1 label bug.** sklearn stores class names alphabetically (`ADMIN, AUTOMATION, FINANCIAL, PERSONAL, PROJECTS`), but `tier1_tfidf.py` looked them up in `CATEGORIES` order. Tier 1 was reporting the wrong label, so it now uses `pipeline.classes_`.
+  - **Tier 1 confidence.** A softmax over SVM margins never went above about 0.6, so the 0.90 threshold was unreachable and Tier 1 never answered. The SVM is now wrapped in `CalibratedClassifierCV` (sigmoid), which gives real probabilities.
+  - **Student.** It was trained for 5 epochs at lr 5e-5, which left it at 50% accuracy and never more than 30% confident, so Tier 2 never answered either. It's now trained for 40 epochs at lr 3e-4, a normal setting for bert-tiny. A one-line `.contiguous()` fix lets pruning run on newer torch.
+  - **Teacher.** 3 epochs → 10. `evaluation_strategy` was renamed `eval_strategy`, which works on transformers 4.41 and newer.
+- **Why:**
+  - Before the fixes, every one of 159 test sentences ended at Tier 3, so the demo couldn't show the idea the project is about.
+  - The fixes also improve BrainDump itself.
+- **Alternatives:**
+  - Ship the models as they were and show them honestly.
+  - Retrain only a copy for the website.
+- **Trade-off:**
+  - The website's models are newer than what's in the public BrainDump repo until you push these changes there.
+  - The old models are backed up in `tools/export/out/backup-2026-11-26/`.
+- **Date:** 2026-11-26
+
+## D-018 Parity checks compare clear cases only
+- **Decision:** the export checks (the original model vs the browser version) require two things:
+  - (a) the probability for every label stays within a small margin of the original's
+  - (b) the same top label **on sentences where the original's top two labels are at least 0.01 apart**
+- **Why:** when two labels are almost tied, a 0.001 change flips the winner, so counting those as "disagreements" would measure noise, not the export.
+- **Alternatives:** require identical labels on every sentence (fails on noise), or check probabilities only.
+- **Trade-off:** none in practice. The probability check still covers the near-tied sentences.
+- **Date:** 2026-11-26
+
+## D-019 The teacher ships as int8 (110 MB), not float16
+- **Decision:** the opt-in Tier 3 teacher is exported as int8 ONNX, about 110 MB.
+- **Why:**
+  - The old teacher lost accuracy under int8, so we waited until after retraining to decide.
+  - The retrained teacher holds up well. It's **98% accurate as int8, the same as the original PyTorch model**, and it gives the same top label on 156 of 159 clear test sentences.
+  - Float16 would double the download for no accuracy gain.
+- **Alternatives:**
+  - float16 (about 220 MB, closer to the original's exact probabilities)
+  - "careful" int8: only matrix multiplications, one scale per channel. In testing it was *less* accurate and bigger, so it was dropped.
+- **Trade-off:**
+  - On average, the teacher's probabilities move about 3 points from the original's. Its gate in `parity_check.py` is therefore a mean difference under 0.05; the student's is 0.03.
+  - A few borderline sentences can come out with a different label than in Python.
 - **Date:** 2026-11-26

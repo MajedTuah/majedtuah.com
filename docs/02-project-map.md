@@ -10,11 +10,16 @@ majedtuah.com/
 ├── vite.config.ts        ← Vite settings: React + Tailwind plugins, port 8443
 ├── tsconfig.json         ← TypeScript settings
 ├── COPY_RULES.md         ← the writing rules for every word on the site
+├── CHANGELOG.md          ← what changed in each version
 ├── docs/                 ← you are here
 ├── public/               ← files served as-is (not processed)
 │   ├── favicon.png       ←   the little browser-tab icon
 │   ├── robots.txt        ←   tells search engines not to list the site (for now)
+│   ├── models/braindump/ ←   the converted BrainDump models (chapter 10)
+│   ├── ort/              ←   ONNX Runtime engine, copied in by scripts/copy-ort.mjs (generated)
 │   └── MajedTuah_Resume.pdf ← the "Download CV" file
+├── scripts/              ← small Node helpers run by package.json (copy-ort.mjs)
+├── tools/export/         ← Python scripts that convert BrainDump for the browser (chapter 10)
 ├── node_modules/         ← downloaded packages (generated, never edit)
 └── src/                  ← ALL the website's code
     ├── main.tsx          ← starting point: loads CSS and mounts <App />
@@ -25,6 +30,8 @@ majedtuah.com/
     ├── assets/
     │   └── portrait-cutout.webp ← your photo with the background removed
     ├── components/       ← one file per section (plus shared pieces)
+    │   └── lab/          ←   the AI Lab demos: RouterDemo.tsx, RagDemo.tsx
+    ├── lab/router/       ← the in-browser BrainDump router: Tier 1 maths, arbitrator, Web Worker, tests
     └── motion/           ← animation helpers (GSAP, smooth scroll, hooks)
 ```
 
@@ -42,7 +49,7 @@ Files in `src/assets/` are imported by code, and Vite renames them with a finger
 | `WhatIDo.tsx` | "What I build" capability cards | Section 01 |
 | `Impact.tsx` | Count-up numbers (**hidden until `IMPACT` has data**) | Between 01 and 02 |
 | `Experience.tsx` | Career timeline with stacking cards | Section 02 |
-| `AiLab.tsx` | Interactive BrainDump router and RAG pipeline demos | Section 03 |
+| `AiLab.tsx` | AI Lab tab shell; loads `lab/RouterDemo.tsx` and `lab/RagDemo.tsx` only when opened | Section 03 |
 | `Teaching.tsx` | Teaching cards (FAMA, workshop, Timedoor) | Section 04 |
 | `About.tsx` | Two pages: Résumé and Projects | Section 05 |
 | `Recognition.tsx` | Awards and recommendations (**hidden until there's data**) | Before Contact |

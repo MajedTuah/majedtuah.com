@@ -47,3 +47,28 @@
 | **View Transitions API** | A browser feature for animating between two states of a page (the About pager) |
 | **Vite** | The tool that translates the code, runs the dev server and builds `dist/` |
 | **WebGL** | The browser's 3D graphics system, which three.js uses |
+
+## AI Lab words (chapters 9–13)
+
+| Term | Plain meaning |
+|---|---|
+| **Arbitrator** | BrainDump's referee: it decides which tier's answer to trust, using confidence thresholds (90% for Tier 1, 85% for Tier 2) |
+| **Calibration (Platt scaling)** | Turning an SVM's raw score into an honest probability with a small sigmoid curve fitted per label |
+| **Dequantize** | Turning int8 weights back into decimals (whole number × scale) |
+| **Distillation** | Training a small "student" model to imitate a big "teacher" model |
+| **Golden fixtures** | Saved "correct answers" that the tests compare our code against |
+| **Hugging Face Hub** | A free website for hosting models; transformers.js can download models from it |
+| **Inference** | Using a trained model to make a prediction (as opposed to training it) |
+| **int8 / quantization** | Storing weights as small whole numbers to make a model about 4× smaller |
+| **Manifest** | `manifest.json`: the list of model files with their sizes, fingerprints, labels and example sentences |
+| **ONNX** | A standard file format for trained models that runs outside Python |
+| **ONNX Runtime / onnxruntime-web** | The engine that runs ONNX files; the web version runs in the browser as WebAssembly |
+| **Parity check** | Proving a converted model gives the same answers as the original |
+| **Pruning** | Zeroing the smallest weights of a model |
+| **Softmax** | Turns a list of scores into probabilities that add up to 1 |
+| **TF-IDF** | Word weighting: words that are frequent in this text but rare overall count most |
+| **Tokenizer** | Splits text into the numbered pieces a BERT model reads |
+| **transformers.js** | Hugging Face's JavaScript library for running models in the browser |
+| **Vitest** | The test runner (`pnpm test`) |
+| **WebAssembly (WASM)** | Fast compiled code that runs inside the browser |
+| **Web Worker** | A background thread in the browser, so heavy work doesn't freeze the page |

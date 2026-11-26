@@ -25,3 +25,7 @@ logs/
 .wrangler/
 tools/export/.venv/
 __pycache__/
+tools/export/out/
+
+# Generated: ONNX Runtime engine copied from node_modules by scripts/copy-ort.mjs
+public/ort/

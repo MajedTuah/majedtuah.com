@@ -1,0 +1,105 @@
+{
+  "labels": [
+    "PERSONAL",
+    "FINANCIAL",
+    "PROJECTS",
+    "ADMIN",
+    "AUTOMATION"
+  ],
+  "thresholds": {
+    "tier1": 0.9,
+    "tier2": 0.85
+  },
+  "maxLength": 128,
+  "presets": [
+    {
+      "text": "set up a cron job to back up the database every night",
+      "expectedTier": 1
+    },
+    {
+      "text": "pay the electricity bill before friday",
+      "expectedTier": 2
+    },
+    {
+      "text": "call mum this weekend",
+      "expectedTier": 3
+    }
+  ],
+  "tiers": {
+    "tier1": {
+      "model": "TF-IDF + LinearSVC",
+      "files": [
+        {
+          "path": "tier1.json",
+          "bytes": 120509,
+          "sha256": "c68a1ccf5ae7816965d075a7dbef38cf6910bb990cf47997e5735204fad6eedb"
+        }
+      ]
+    },
+    "tier2": {
+      "model": "bert-tiny student (distilled, pruned, int8)",
+      "files": [
+        {
+          "path": "student/config.json",
+          "bytes": 1006,
+          "sha256": "01cab9d7e4ea3395667e4fb277991f36bbb2752a9032c1cd64841f3142e5ebcc"
+        },
+        {
+          "path": "student/onnx/model_quantized.onnx",
+          "bytes": 4499758,
+          "sha256": "1df26ac7a9588a5bfaf48c7fe976f63770c4b3bd6b4b80b237f92b1df6c6890d"
+        },
+        {
+          "path": "student/special_tokens_map.json",
+          "bytes": 732,
+          "sha256": "5aa43c2f985a25296d5a5ce621c2f77376ca8091a47993c492fd5460b895b140"
+        },
+        {
+          "path": "student/tokenizer.json",
+          "bytes": 711494,
+          "sha256": "79ea220416a57ca8acdf069d71875d5d2ddadef66021aeb6c120a7c546c04344"
+        },
+        {
+          "path": "student/tokenizer_config.json",
+          "bytes": 1524,
+          "sha256": "0e08c8ad87031f2fe0b9f8635ff01db323c9b43328dcf3d87f5b585b0d00a991"
+        }
+      ]
+    },
+    "tier3": {
+      "model": "BERT teacher (int8)",
+      "files": [
+        {
+          "path": "config.json",
+          "bytes": 1095,
+          "sha256": "7815f23c266cfb66070ca256c65325e339a71064252cf445ec5c3cbe068af341"
+        },
+        {
+          "path": "onnx/model_quantized.onnx",
+          "bytes": 110371416,
+          "sha256": "8107e220cd4d48c69603d1a2f6f75a09af963516af3f6b2e15f3719c946de9fb"
+        },
+        {
+          "path": "README.md",
+          "bytes": 471,
+          "sha256": "464a0e0c6897a82df763dd6d5bafc992edd4ec8c10075c67cd8d2086632b6085"
+        },
+        {
+          "path": "special_tokens_map.json",
+          "bytes": 732,
+          "sha256": "5aa43c2f985a25296d5a5ce621c2f77376ca8091a47993c492fd5460b895b140"
+        },
+        {
+          "path": "tokenizer.json",
+          "bytes": 711396,
+          "sha256": "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66"
+        },
+        {
+          "path": "tokenizer_config.json",
+          "bytes": 1299,
+          "sha256": "dc4e62287e74f12618d0e86a8b9e784a5243addf98ba490d0906ec83030f4e9f"
+        }
+      ]
+    }
+  }
+}

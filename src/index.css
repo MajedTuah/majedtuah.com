@@ -931,3 +931,24 @@
     animation: none;
   }
 }
+
+/* AI Lab terminal caret (src/components/lab/Terminal.tsx) */
+.term-caret {
+  display: inline-block;
+  width: 7px;
+  height: 13px;
+  margin-left: 1px;
+  vertical-align: -2px;
+  background: var(--color-accent);
+  animation: term-blink 1.05s steps(1) infinite;
+}
+@keyframes term-blink {
+  50% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .term-caret {
+    animation: none;
+  }
+}

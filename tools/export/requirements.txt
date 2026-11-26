@@ -1,0 +1,17 @@
+# Python tools that convert the BrainDump models for the browser.
+# Explained in docs/10-braindump-in-the-browser.md. Use Python 3.11.
+# scikit-learn is pinned to the version BrainDump trained tier1_svm.pkl with,
+# so the pickle loads exactly as it was saved.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.5.1
+transformers==4.46.3
+optimum[onnxruntime]==1.23.3
+onnx==1.17.0
+onnxruntime==1.20.1
+scikit-learn==1.5.0
+numpy<2
+accelerate==1.1.1
+pyarrow<17
+matplotlib
+pandas
+datasets==2.19.1

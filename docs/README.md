@@ -15,6 +15,10 @@ builds on the one before it.
 | 6 | [How to change things](06-how-to-change-things.md) | Recipes: edit text, add a project, change a colour, and so on |
 | 7 | [Performance and lessons learned](07-performance-and-lessons.md) | Why some effects were removed, and the bugs we hit |
 | 8 | [Glossary](08-glossary.md) | Every jargon word in one place |
+| 9 | [AI Lab overview](09-ai-lab-overview.md) | What runs where: the in-browser router and the RAG API |
+| 10 | [BrainDump in the browser](10-braindump-in-the-browser.md) | How your trained models were converted, checked and run in the browser |
+| — | [Decision log](decisions.md) | *Why* every technical choice was made |
+| — | [Changelog](../CHANGELOG.md) | What changed, version by version |
 
 ## The one-minute version
 
@@ -41,4 +45,5 @@ Run these in the VS Code terminal, inside the project folder. On your Windows Po
 | `npx.cmd pnpm@11 dev` | Starts the site at http://localhost:8443. It updates live as you save files. |
 | `npx.cmd pnpm@11 build` | Makes the final, optimised website in a `dist/` folder |
 | `npx.cmd pnpm@11 preview` | Serves that `dist/` folder, so you see the real speed |
+| `npx.cmd pnpm@11 test` | Runs the automated tests (the AI Lab's model checks) |
 | `npx.cmd pnpm@11 install` | Re-downloads all the packages (only needed if `node_modules` is missing) |
