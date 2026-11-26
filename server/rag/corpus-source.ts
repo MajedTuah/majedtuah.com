@@ -7,6 +7,8 @@ import { CAPABILITIES, LINKS, MORE_PROJECTS, PROJECTS, RESUME, TEACHING } from '
 import type { Chunk } from './types.ts'
 
 const plain = (s: string) => s.replace(/\*\*/g, '').replace(/\s+/g, ' ').trim()
+// Questions name Majed. A passage that never says his name scores as unrelated, so each one stands alone.
+const nameHim = (chunk: Chunk): Chunk => (/majed/i.test(`${chunk.title} ${chunk.text}`) ? chunk : { ...chunk, text: `Majed Tuah. ${chunk.text}` })
 const slug = (s: string) =>
   s
     .toLowerCase()
@@ -91,7 +93,7 @@ export function chunksFromSite(): Chunk[] {
     text: `${ed.degree}, ${ed.school}, ${ed.place}, graduated ${ed.date}, GPA ${ed.gpa}. Certification: ${cert.name} (${cert.detail}), ${cert.date}.`,
   })
 
-  return out
+  return out.map(nameHim)
 }
 
 /**
@@ -109,5 +111,5 @@ export function chunksFromMarkdown(file: string, markdown: string): Chunk[] {
       return { heading: heading.trim(), text: plain(rest.join(' ').replace(/[#>*_`]/g, ' ')) }
     })
     .filter((s) => s.text.length > 20)
-    .map((s) => ({ id: `note:${slug(name)}:${slug(s.heading)}`, source, title: s.heading, text: s.text }))
+    .map((s) => nameHim({ id: `note:${slug(name)}:${slug(s.heading)}`, source, title: s.heading, text: s.text }))
 }

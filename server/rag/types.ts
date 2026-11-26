@@ -73,8 +73,8 @@ export interface Limits {
 
 /** One line of the NDJSON stream /api/ask sends back (decision D-010). */
 export type AskEvent =
-  | { type: 'check'; ok: true; remaining: number }
-  | { type: 'limit'; reason: 'visitor' | 'daily'; email: string }
+  | { type: 'check'; ok: true; remaining: number; ms: number }
+  | { type: 'limit'; reason: 'visitor' | 'daily'; email: string; ms: number }
   | { type: 'guard'; ok: boolean; score: number; ms: number }
   | { type: 'retrieve'; ms: number; hits: { id: string; title: string; keywordRank: number | null; vectorRank: number | null }[] }
   | { type: 'rerank'; ms: number; top: { id: string; title: string; score: number }[] }

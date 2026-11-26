@@ -10,7 +10,7 @@ import { Section } from './ui'
 const RouterDemo = lazy(() => import('./lab/RouterDemo'))
 const RagDemo = lazy(() => import('./lab/RagDemo'))
 
-const TABS = ['Distillation router', 'RAG pipeline'] as const
+const TABS = ['RAG pipeline', 'BrainDump'] as const
 
 export default function AiLab({ n }: { n: string }) {
   const [tab, setTab] = useState(0)
@@ -42,7 +42,7 @@ export default function AiLab({ n }: { n: string }) {
         }
       />
       <div key={tab} className="page-in" role="tabpanel">
-        <Suspense fallback={<div className="glass min-h-[420px] rounded-3xl" aria-busy="true" />}>{tab === 0 ? <RouterDemo /> : <RagDemo />}</Suspense>
+        <Suspense fallback={<div className="glass min-h-[420px] rounded-3xl" aria-busy="true" />}>{tab === 0 ? <RagDemo /> : <RouterDemo />}</Suspense>
       </div>
     </Section>
   )

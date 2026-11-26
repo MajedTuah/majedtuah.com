@@ -17,6 +17,7 @@ builds on the one before it.
 | 8 | [Glossary](08-glossary.md) | Every jargon word in one place |
 | 9 | [AI Lab overview](09-ai-lab-overview.md) | What runs where: the in-browser router and the RAG API |
 | 10 | [BrainDump in the browser](10-braindump-in-the-browser.md) | How your trained models were converted, checked and run in the browser |
+| 11 | [Ask about my work](11-rag-api.md) | The RAG tab: notes, search, rerank, Groq, and one question walked through |
 | — | [Decision log](decisions.md) | *Why* every technical choice was made |
 | — | [Changelog](../CHANGELOG.md) | What changed, version by version |
 

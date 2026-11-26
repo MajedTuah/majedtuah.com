@@ -32,6 +32,27 @@ export async function remainingFor(store: CounterStore, ip: string, limits: Limi
   return Math.max(0, limits.perVisitor - (await store.get('visitor:' + (await hashIp(ip)))))
 }
 
+/** The bit of Cloudflare KV the counter needs. Kept narrow so this file has no Workers types. */
+export interface KvLike {
+  get(key: string): Promise<string | null>
+  put(key: string, value: string, options?: { expirationTtl?: number }): Promise<unknown>
+}
+
+/** Production counters. KV's shortest TTL is 60 seconds, and each write refreshes it. */
+export function kvStore(kv: KvLike): CounterStore {
+  return {
+    async get(key) {
+      const v = await kv.get(key)
+      return v ? Number(v) || 0 : 0
+    },
+    async increment(key, ttlSeconds) {
+      const n = (Number(await kv.get(key)) || 0) + 1
+      await kv.put(key, String(n), { expirationTtl: Math.max(60, ttlSeconds) })
+      return n
+    },
+  }
+}
+
 /** For `pnpm dev` and tests. Production uses Cloudflare KV (functions/api/ask.ts). */
 export function memoryStore(now: () => number = Date.now): CounterStore {
   const data = new Map<string, { n: number; expires: number }>()

@@ -29,6 +29,25 @@ export function originAllowed(origin: string | null, allowed: string[]): boolean
   return !!origin && allowed.includes(origin)
 }
 
+/** `ALLOWED_ORIGINS` is a comma-separated list. An empty value means "use the fallback". */
+export function originList(raw: string | undefined, fallback: string[]): string[] {
+  const list = raw?.split(',').map((s) => s.trim()).filter(Boolean)
+  return list?.length ? list : fallback
+}
+
+/** Cloudflare Turnstile. Missing token or a failed check both mean "no". */
+export async function turnstileOk(secret: string, token: string | undefined, ip: string): Promise<boolean> {
+  if (!token) return false
+  const body = new FormData()
+  body.set('secret', secret)
+  body.set('response', token)
+  body.set('remoteip', ip)
+  const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body })
+  if (!res.ok) return false
+  const json = (await res.json()) as { success?: boolean }
+  return json.success === true
+}
+
 export const NDJSON_HEADERS = {
   'Content-Type': 'application/x-ndjson; charset=utf-8',
   'Cache-Control': 'no-store',

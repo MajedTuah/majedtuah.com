@@ -1,0 +1,11 @@
+# Copy this file to .dev.vars and fill in the key. .dev.vars is gitignored.
+# Get a free key at https://console.groq.com/keys
+GROQ_API_KEY=
+
+# Optional. Defaults live in server/rag/config.ts.
+# GROQ_MODEL=openai/gpt-oss-20b
+# GROQ_FALLBACK_MODEL=openai/gpt-oss-120b
+# GROQ_GUARD_MODEL=meta-llama/llama-prompt-guard-2-86m
+
+# Comma-separated. Local dev already allows http://localhost:8443.
+# ALLOWED_ORIGINS=http://localhost:8443,https://majedtuah.com

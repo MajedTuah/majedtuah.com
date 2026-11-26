@@ -32,9 +32,9 @@ export async function runAsk(question: string, ip: string, deps: Deps, emit: (e:
   try {
     // 1. Check: has this visitor (or the whole site today) used up its questions?
     const allowed = await takeQuestion(deps.store, ip, limits, now())
-    if (!allowed.ok) return emit({ type: 'limit', reason: allowed.reason, email: deps.email })
+    if (!allowed.ok) return emit({ type: 'limit', reason: allowed.reason, email: deps.email, ms: now() - started })
     remaining = allowed.remaining
-    emit({ type: 'check', ok: true, remaining })
+    emit({ type: 'check', ok: true, remaining, ms: now() - started })
 
     // 2. Guard: Prompt Guard scores the question before any other model sees it.
     let t = now()

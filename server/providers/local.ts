@@ -5,10 +5,12 @@
  * stay valid when we switch. First run downloads ~140 MB into .cache/ (gitignored). Decision D-021.
  */
 import { AutoModelForSequenceClassification, AutoTokenizer, env, pipeline } from '@huggingface/transformers'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { EMBED_MODEL, RERANK_MODEL } from '../rag/config.ts'
 
-env.cacheDir = resolve(import.meta.dirname, '../../.cache/transformers')
+// import.meta.url stays correct both under `node scripts/build-corpus.ts` and Vite's dev server.
+env.cacheDir = resolve(dirname(fileURLToPath(import.meta.url)), '../../.cache/transformers')
 
 type Embedder = (texts: string[]) => Promise<number[][]>
 let embedder: Promise<Embedder> | null = null

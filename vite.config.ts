@@ -46,14 +46,48 @@ function devTeacher(): Plugin {
   }
 }
 
+/**
+ * Development only: POST /api/ask runs the RAG pipeline on this machine (server/dev-ask.ts).
+ * The handler is loaded through Vite so the server code stays in TypeScript. Production is
+ * functions/api/ask.ts, which this plugin never includes in the build.
+ */
+function devAsk(): Plugin {
+  return {
+    name: 'dev-ask',
+    apply: 'serve',
+    configureServer(server) {
+      // Vitest boots this config too. Loading the embedder there crashes the test run.
+      if (process.env.VITEST) return
+      server.middlewares.use(async (req, res, next) => {
+        const url = (req.url ?? '').split('?')[0]
+        if (url !== '/api/ask') return next()
+        try {
+          const mod = (await server.ssrLoadModule('/server/dev-ask.ts')) as typeof import('./server/dev-ask.ts')
+          await mod.handleDevAsk(req, res)
+        } catch (e) {
+          console.error('[ask]', e)
+          if (!res.headersSent) {
+            res.statusCode = 500
+            res.setHeader('Content-Type', 'application/json; charset=utf-8')
+            res.end(JSON.stringify({ error: 'The ask demo failed to start.' }))
+          } else res.end()
+        }
+      })
+      void server.ssrLoadModule('/server/dev-ask.ts').then((mod) => (mod as typeof import('./server/dev-ask.ts')).warmAsk())
+    },
+  }
+}
+
 // Vite config: https://vite.dev/config/
 // The page title, description, favicon and robots tag live in index.html.
 export default defineConfig({
-  plugins: [react(), tailwindcss(), devTeacher()],
+  plugins: [react(), tailwindcss(), devTeacher(), devAsk()],
   worker: { format: 'es', plugins: () => [dropUnusedOrtWasm()] },
   // Pre-bundle transformers.js at dev-server start. Otherwise Vite discovers it when the AI Lab
   // first opens and reloads the whole page mid-visit.
   optimizeDeps: { include: ['@huggingface/transformers'] },
+  // The ask handler imports transformers.js. Leave that package to Node during dev SSR.
+  ssr: { external: ['@huggingface/transformers', 'onnxruntime-common', 'onnxruntime-node', 'onnxruntime-web'] },
   build: {
     // Never publish source maps: they would hand out the original source code (docs/12-security.md)
     sourcemap: false,

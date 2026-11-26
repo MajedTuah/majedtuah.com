@@ -20,6 +20,8 @@ if (existsSync(contentDir)) {
   }
 }
 
+if (!chunks.length) throw new Error('No passages to embed. Check src/data.ts and content/*.md.')
+
 const ids = new Set<string>()
 for (const c of chunks) {
   if (ids.has(c.id)) throw new Error(`Duplicate chunk id "${c.id}": give the two sections different headings`)

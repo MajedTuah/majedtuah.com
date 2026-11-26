@@ -10,6 +10,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
+    "corpus": "node --experimental-strip-types scripts/build-corpus.ts",
     "format": "oxfmt"
   },
   "dependencies": {

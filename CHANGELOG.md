@@ -13,6 +13,8 @@ Every change to majedtuah.com is written down here, newest first.
 ## [Unreleased]
 
 ### Added
+- [docs/11-rag-api.md](docs/11-rag-api.md): how the ask demo works, with the real "Where does Majed teach?" run as the example.
+- **Ask about my work**, live. `pnpm corpus` embeds the site's notes into `server/corpus.json`. `pnpm dev` serves `POST /api/ask`: local embeddings and reranking, Groq for the guard and the answer. The RAG tab streams each stage as it finishes. The same pipeline is in `functions/api/ask.ts` for Cloudflare (Workers AI + KV). Copy `.dev.vars.example` to `.dev.vars` and add `GROQ_API_KEY`.
 - The Tier 3 BERT teacher now loads during development (`pnpm dev`): a dev-only Vite plugin serves it from `tools/export/out/teacher/`. "Load teacher" works locally before the Hugging Face upload. Tested in Edge: "call mum this weekend" now goes through all three tiers, and the teacher answers PERSONAL at 95% in 34 ms. Production is unchanged; it still needs the upload and `VITE_TEACHER_REPO`. See [docs/10 → The teacher](docs/10-braindump-in-the-browser.md#the-teacher-tier-3-where-it-loads-from).
 - Step-by-step Hugging Face upload instructions in docs/10.
 
